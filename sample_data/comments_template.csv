@@ -1,0 +1,9 @@
+post_id,comment_text,language_type,topic,sentiment,purchase_intent
+P001,Price please?,English,Price inquiry,Neutral,Possible inquiry
+P001,Price bohat zyada hai.,Roman Urdu,Price objection,Negative,Low intent
+P002,Is this available in Karachi?,English,Availability,Neutral,Possible inquiry
+P002,Delivery kitne din mein hogi?,Roman Urdu,Delivery,Neutral,Possible inquiry
+P003,Very beautiful dress!,English,Compliment,Positive,Low intent
+P003,Any discount on this suit?,English,Discount,Neutral,Possible inquiry
+P004,Ordered last week still waiting.,English,Delivery complaint,Negative,Existing customer
+P004,Inbox me details send kar dein.,Roman Urdu,Purchase interest,Positive,High intent

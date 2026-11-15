@@ -1,0 +1,6 @@
+post_id,brand,platform,campaign,content_type,product_category,likes,comments_count,shares,views,days_since_post
+P001,Demo Brand,Instagram,Eid Collection,Reel,Lawn suit,1250,186,95,25000,5
+P002,Demo Brand,TikTok,Eid Collection,Styling video,Lawn suit,980,120,70,18000,4
+P003,Demo Brand,Facebook,11.11,Product photo,Lawn suit,430,45,20,9000,7
+P004,Demo Brand,Instagram,12.12,Influencer post,Lawn suit,3200,340,240,56000,2
+P005,Demo Brand,Instagram,12.12,Sale announcement,Lawn suit,2100,270,180,30000,1

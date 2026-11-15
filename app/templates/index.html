@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Audience Intelligence</title><link rel="stylesheet" href="/static/style.css"></head>
+<body><div class="shell">
+<header><div><div class="eyebrow">CAMPAIGN INTELLIGENCE / PAKISTAN</div><h1>Audience Intelligence Engine</h1><p>Turn manually uploaded social comments into actionable audience segments.</p></div><div class="live">● LOCAL WORKSPACE</div></header>
+{% if request.query_params.get('error') %}<div class="alert">{{ request.query_params.get('error') }}</div>{% endif %}
+<section class="stats">
+<div class="stat"><span>COMMENTS LOADED</span><strong>{{ "{:,}".format(comment_count) }}</strong><small>CSV records analyzed</small></div>
+<div class="stat"><span>POSTS LOADED</span><strong>{{ "{:,}".format(post_count) }}</strong><small>Campaign records analyzed</small></div>
+<div class="stat"><span>ANALYSIS MODE</span><strong>Clustering</strong><small>TF-IDF + K-Means</small></div>
+</section>
+<section class="upload-grid">
+<div class="panel upload"><div class="panel-head"><div><span class="eyebrow">DATA INPUT 01</span><h2>Upload comments</h2></div><span class="number">01</span></div>
+<p>Upload a CSV containing <code>post_id</code> and <code>comment_text</code>. Optional columns include language_type, topic, sentiment and purchase_intent.</p>
+<form action="/upload/comments" method="post" enctype="multipart/form-data"><label class="filebox"><input type="file" name="file" accept=".csv" required><span>Choose comments CSV</span></label><button>Analyze comments ↗</button></form>
+<a class="subtle" href="/sample/comments.csv">Download comments CSV template</a></div>
+<div class="panel upload"><div class="panel-head"><div><span class="eyebrow">DATA INPUT 02 / OPTIONAL</span><h2>Upload post metrics</h2></div><span class="number">02</span></div>
+<p>Compare content types and flag unusual posts. Required: post_id, brand, platform, content_type, likes, comments_count. Shares and views are optional.</p>
+<form action="/upload/posts" method="post" enctype="multipart/form-data"><label class="filebox"><input type="file" name="file" accept=".csv" required><span>Choose posts CSV</span></label><button class="secondary">Analyze post metrics ↗</button></form>
+<a class="subtle" href="/sample/posts.csv">Download posts CSV template</a></div></section>
+{% if result %}
+<section class="section-title"><div><span class="eyebrow">AUDIENCE DISCOVERY</span><h2>What your audience is telling you</h2></div><span class="pill">Based on {{ result.total }} comments</span></section>
+<div class="content-grid"><div class="panel"><h3>Audience needs by topic</h3><p class="muted">Keyword-assisted topic grouping. Share is calculated from uploaded comments.</p>
+{% for item in result.topics %}<div class="topic"><div class="topic-line"><b>{{ item.topic }}</b><span>{{ item.count }} · {{ item.share }}%</span></div><div class="bar"><i style="width:{{ item.share }}%"></i></div><p class="action">↳ {{ item.action }}</p></div>{% endfor %}</div>
+<div class="panel"><h3>Similar-comment clusters</h3><p class="muted">K-Means groups comments with similar TF-IDF text patterns.</p>
+{% for c in result.clusters %}<div class="cluster"><div class="cluster-top"><b>Group {{ c.cluster + 1 }} · {{ c.label }}</b><span>{{ c.count }} comments</span></div>{% for ex in c.examples %}<blockquote>“{{ ex }}”</blockquote>{% endfor %}</div>{% endfor %}</div></div>
+<div class="panel table-panel"><h3>Comment sample</h3><div class="table-wrap"><table><thead><tr><th>Post ID</th><th>Comment</th><th>Detected need</th><th>Cluster</th></tr></thead><tbody>{% for row in result.sample %}<tr><td>{{ row.post_id }}</td><td>{{ row.comment_text }}</td><td><span class="tag">{{ row.topic_detected }}</span></td><td>{{ row.cluster + 1 }}</td></tr>{% endfor %}</tbody></table></div></div>
+{% else %}
+<div class="empty panel"><div class="empty-icon">↗</div><h2>Your audience insights will appear here</h2><p>Start by uploading your comments CSV. The app does not scrape social platforms or require API keys.</p></div>
+{% endif %}
+{% if post_result %}
+<section class="section-title"><div><span class="eyebrow">CONTENT PERFORMANCE</span><h2>Which content attracts attention?</h2></div><span class="pill">{{ post_result.total }} posts</span></section>
+<div class="content-grid"><div class="panel"><h3>Average engagement by content type</h3><p class="muted">Engagement = likes + comments + shares (when provided).</p>
+{% for p in post_result.content %}<div class="topic"><div class="topic-line"><b>{{ p.content_type }}</b><span>{{ p.avg_engagement }} avg.</span></div><div class="bar"><i style="width:{{ [p.avg_engagement / (post_result.content[0].avg_engagement if post_result.content[0].avg_engagement else 1) * 100, 100]|min }}%"></i></div></div>{% endfor %}</div>
+<div class="panel"><h3>Unusual post patterns</h3><p class="muted">Isolation Forest flags posts with outlying engagement metrics. Investigate before drawing conclusions.</p>
+{% if post_result.unusual %}{% for p in post_result.unusual %}<div class="cluster-top"><b>{{ p.post_id }} · {{ p.content_type }}</b><span>{{ p.engagement|int }} engagements</span></div>{% endfor %}{% else %}<p class="muted">No unusual posts flagged in this dataset.</p>{% endif %}</div></div>
+{% endif %}
+<footer>Audience Intelligence Engine <span>FastAPI · Manual CSV input · Local demo</span></footer>
+</div></body></html>
